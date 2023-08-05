@@ -4,7 +4,6 @@
 // Make the code compile and the tests pass!
 // Execute `rustlings hint structs3` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
 
 #[derive(Debug)]
 struct Package {
@@ -26,12 +25,32 @@ impl Package {
         }
     }
 
-    fn is_international(&self) -> ??? {
-        // Something goes here...
+    fn is_international(&self) -> bool {
+        // // &Package
+        // let check_type1 = self;
+        // // String (NOT &String)
+        // // NOTE: this will *try* to move the field (and fail if `&self` used in sig.)
+        // // Surprisingly I can move out BOTH of the valuesk
+        // let check_type2 = self.sender_country;
+        // let check_type3 = self.recipient_country;
+        //
+        // check_type2 != check_type3
+
+        //works:
+        // NOTE: the `.` dereferences self (a reference here)
+        //       giving the *actual* value, not a ref to it
+        self.sender_country != self.recipient_country
+        // // also works (as the ref stacks is collapsed):
+        // self.sender_country != (&self).recipient_country
+
+        // // does_NOT work:
+        // self.sender_country != &self.recipient_country
+        // // becuase interperted as this (i believe):
+        // self.sender_country != &(self.recipient_country)
     }
 
-    fn get_fees(&self, cents_per_gram: i32) -> ??? {
-        // Something goes here...
+    fn get_fees(&self, cents_per_gram: i32) -> i32 {
+        self.weight_in_grams * cents_per_gram
     }
 }
 

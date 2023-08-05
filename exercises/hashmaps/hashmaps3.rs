@@ -14,7 +14,6 @@
 
 // Execute `rustlings hint hashmaps3` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
 
 use std::collections::HashMap;
 
@@ -40,6 +39,56 @@ fn build_scores_table(results: String) -> HashMap<String, Team> {
         // will be the number of goals conceded from team_2, and similarly
         // goals scored by team_2 will be the number of goals conceded by
         // team_1.
+
+        // let default = Team {
+        //     name: String::from("error"),
+        //     goals_scored: 0,
+        //     goals_conceded: 0,
+        // };
+        //
+        // // OOF -- I might be passing my tests, but there's got to be a better way
+        // //        to do this
+        // scores.entry(team_1_name.clone()).or_insert(Team {
+        //     name: team_1_name.clone(),
+        //     ..default
+        // });
+        // scores.entry(team_2_name.clone()).or_insert(Team {
+        //     name: team_1_name.clone(),
+        //     ..default
+        // });
+        //
+        // scores.entry(team_1_name).and_modify(|s| {
+        //     s.goals_scored += team_1_score;
+        //     s.goals_conceded += team_2_score;
+        // });
+        // scores.entry(team_2_name).and_modify(|s| {
+        //     s.goals_scored += team_2_score;
+        //     s.goals_conceded += team_1_score;
+        // });
+
+        scores
+            .entry(team_1_name)
+            .and_modify(|s| {
+                s.goals_scored += team_1_score;
+                s.goals_conceded += team_2_score;
+            })
+            .or_insert_with_key( |team_name| Team {
+                name: team_name.clone(),
+                goals_scored: team_1_score,
+                goals_conceded: team_2_score,
+            });
+
+        scores
+            .entry(team_2_name)
+            .and_modify(|s| {
+                s.goals_scored += team_2_score;
+                s.goals_conceded += team_1_score;
+            })
+            .or_insert_with_key(|team_name| Team {
+                name: team_name.to_owned(),
+                goals_scored: team_2_score,
+                goals_conceded: team_1_score,
+            });
     }
     scores
 }
