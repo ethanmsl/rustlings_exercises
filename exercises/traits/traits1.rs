@@ -9,7 +9,6 @@
 // implementing this trait.
 // Execute `rustlings hint traits1` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
 
 trait AppendBar {
     fn append_bar(self) -> Self;
@@ -17,6 +16,24 @@ trait AppendBar {
 
 impl AppendBar for String {
     // TODO: Implement `AppendBar` for type `String`.
+    fn append_bar(/* mut  */ self) -> Self {
+        // this works even though `self` is not mutable!
+        // it consume the string and reuses it's buffer apparently
+        // it's interesting that we can destructively use self, but not alter it
+        // not entirely unreasonable, but a little bit surprising
+        // the fact that the following is an expression rather than a statement is
+        // important here
+        self + "Bar"
+
+        // this does NOT work as it attempt to mutate self
+        // self.push_str("Bar");
+        // self
+
+        // BUT we CAN change this to have `(mut self)` as part of its signature
+        // as the `mut ` is considered a pattern, not type
+        // we don't need the trait-impl to have mut defined
+        // (and, in fact, the compiler will balk if we try to)
+    }
 }
 
 fn main() {
