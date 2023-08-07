@@ -16,14 +16,14 @@ pub enum DivisionError {
 }
 impl fmt::Display for DivisionError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let description = match *self {
-            DivisionError::NotDivisible(strct) => &format!(
+        let description = match self {
+            DivisionError::NotDivisible(strct) => format!(
                 "{} is not evenly divisible by {}",
-                strct.dividend, strct.divisor
+                strct.dividend.clone(), strct.divisor.clone()
             ),
-            DivisionError::DivideByZero => "divisor is zero",
+            DivisionError::DivideByZero => "divisor is zero".to_string(),
         };
-        f.write_str(description)
+        f.write_str(&description)
     }
 }
 impl error::Error for DivisionError {}
@@ -60,7 +60,8 @@ fn result_with_list() -> Result<Vec<i32>, Box<dyn std::error::Error>> {
     //     .map(|okay| okay.unwrap())
     //     .collect::<Vec<i32>>();
     // Ok(outish)
-    division_results
+    // `?` returns `From::from(E)`, which is why it works with signature
+    Ok(division_results?)
 }
 
 // Complete the function and return a value of the correct type so the test passes.
