@@ -7,12 +7,26 @@
 // Execute `rustlings hint iterators3` or use the `hint` watch subcommand for a hint.
 
 // I AM NOT DONE
+use std::{error, fmt};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DivisionError {
     NotDivisible(NotDivisibleError),
     DivideByZero,
 }
+impl fmt::Display for DivisionError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let description = match *self {
+            DivisionError::NotDivisible(strct) => &format!(
+                "{} is not evenly divisible by {}",
+                strct.dividend, strct.divisor
+            ),
+            DivisionError::DivideByZero => "divisor is zero",
+        };
+        f.write_str(description)
+    }
+}
+impl error::Error for DivisionError {}
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct NotDivisibleError {
@@ -23,14 +37,30 @@ pub struct NotDivisibleError {
 // Calculate `a` divided by `b` if `a` is evenly divisible by `b`.
 // Otherwise, return a suitable error.
 pub fn divide(a: i32, b: i32) -> Result<i32, DivisionError> {
-    todo!();
+    // todo!();
+    match (a, b) {
+        _ if b == 0 => Err(DivisionError::DivideByZero),
+        _ if a % b == 0 => Ok(a / b),
+        _ => Err(DivisionError::NotDivisible(NotDivisibleError {
+            dividend: a,
+            divisor: b,
+        })),
+    }
 }
 
 // Complete the function and return a value of the correct type so the test passes.
 // Desired output: Ok([1, 11, 1426, 3])
-fn result_with_list() -> () {
+//
+// NOTE: Result implements FromIterator so that a vector of results (Vec<Result<T, E>>) can be turned into a result with a vector (Result<Vec<T>, E>). Once an Result::Err is found, the iteration will terminate.
+fn result_with_list() -> Result<Vec<i32>, Box<dyn std::error::Error>> {
     let numbers = vec![27, 297, 38502, 81];
-    let division_results = numbers.into_iter().map(|n| divide(n, 27));
+    let division_results: Result<Vec<i32>, _> =
+        numbers.into_iter().map(|n| divide(n, 27)).collect();
+    // let outish = division_results
+    //     .map(|okay| okay.unwrap())
+    //     .collect::<Vec<i32>>();
+    // Ok(outish)
+    division_results
 }
 
 // Complete the function and return a value of the correct type so the test passes.
