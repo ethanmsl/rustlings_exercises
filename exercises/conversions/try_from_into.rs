@@ -34,17 +34,15 @@ enum IntoColorError {
 // but the slice implementation needs to check the slice length!
 // Also note that correct RGB color values must be integers in the 0..=255 range.
 
-
-
-/// pulling out some verbose and repeated code for fallibaly converting to u8s
-/// for the purpose of working with Color
-/// **TODO**: This should be a non-instanced implementatio of `Color`
-/// as it even uses it's error ... or maybe implementation of the error...
-fn color_num_convert<Try8>(num: Try8) -> Result<u8, IntoColorError>
-where
-    Try8: TryInto<u8>,
-{
-    Ok(num.try_into().map_err(|_| IntoColorError::IntConversion)?)
+impl Color {
+    /// pulling out some verbose and repeated code for fallibaly converting to u8s
+    /// for the purpose of working with Color
+    fn color_num_convert<Try8>(num: Try8) -> Result<u8, IntoColorError>
+    where
+        Try8: TryInto<u8>,
+    {
+        Ok(num.try_into().map_err(|_| IntoColorError::IntConversion)?)
+    }
 }
 
 // Tuple implementation
@@ -53,9 +51,9 @@ impl TryFrom<(i16, i16, i16)> for Color {
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
         let (red, green, blue) = tuple;
 
-        let red: u8 = color_num_convert(red)?;
-        let green: u8 = color_num_convert(green)?;
-        let blue: u8 = color_num_convert(blue)?;
+        let red: u8 = Color::color_num_convert(red)?;
+        let green: u8 = Color::color_num_convert(green)?;
+        let blue: u8 = Color::color_num_convert(blue)?;
 
         Ok(Color { red, green, blue })
     }
@@ -67,7 +65,7 @@ impl TryFrom<[i16; 3]> for Color {
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
         let converted: [u8; 3] = arr
             .into_iter()
-            .map(|val| color_num_convert(val))
+            .map(|val| Color::color_num_convert(val))
             .collect::<Result<Vec<u8>, _>>()?
             .try_into()
             .expect("compile time restrictions should not allow array destructuring to fail here");
@@ -82,7 +80,6 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
-
         // changes to this impact validity of array construction below
         if slice.len() != 3 {
             return Err(IntoColorError::BadLen);
@@ -92,7 +89,7 @@ impl TryFrom<&[i16]> for Color {
         let converted: [u8; 3] = slice
             .into_iter()
             .take(3)
-            .map(|val| color_num_convert(*val))
+            .map(|val| Color::color_num_convert(*val))
             .collect::<Result<Vec<u8>, _>>()?
             .try_into()
             .expect("runtime+compiletime restrictions should prevent failing at this point");
