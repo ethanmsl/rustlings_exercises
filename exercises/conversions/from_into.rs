@@ -38,45 +38,45 @@ impl Default for Person {
 // I AM NOT DONE
 
 impl From<&str> for Person {
-    // Alternate, more imperative approach.  At first seems nicer, but I'm actually
-    // digging the iter approach more as I look into the two closely
+    /// 'single' iter solution
+    /// uses `split_once()` to break number parsing if additional text at tail
+    /// `.filter()` takes in the `Option`, returning `None` if given that
+    ///             (we could also test age for presence here, but it is implicitely tested
+    ///              when we try to parse it)
     fn from(s: &str) -> Person {
-    // 'single' iter solution
-    // uses `split_once()` to break number parsing if additional text at tail
-    // `.filter()` takes in the `Option`, returning `None` if given that
-    //             (we could also test age for presence here, but it is implicitely tested
-    //              when we try to parse it)
-        //     // iter solutions
-        //     s.split_once(',')
-        //         .filter(|(name, age)| !name.is_empty())
-        //         .map(|(name, age)| {
-        //             age.parse()
-        //                 .map(|age| Person {
-        //                     name: name.into(),
-        //                     age,
-        //                 })
-        //                 .ok()
-        //         })
-        //         .flatten()
-        //         .unwrap_or_default()
-        // }
-
-        // if let solutions
-        let (name, age) = match s.split_once(',') {
-            Some((name, age)) => (name.trim(), age.trim()),
-            _ => return Person::default(),
-        };
-
-        if let Ok(age) = age.parse::<usize>() {
-            if name.len() > 0 {
-                return Person {
-                    name: name.to_string(),
-                    age,
-                };
-            }
-        }
-        Person::default()
+        // iter solutions
+        s.split_once(',')
+            .filter(|(name, age)| !name.is_empty())
+            .map(|(name, age)| {
+                age.parse()
+                    .map(|age| Person {
+                        name: name.into(),
+                        age,
+                    })
+                    .ok()
+            })
+            .flatten()
+            .unwrap_or_default()
     }
+
+    // // Alternate, more imperative approach.  At first seems nicer, but I'm actually
+    // // digging the iter approach more as I look into the two closely
+    //     // if let solutions
+    //     let (name, age) = match s.split_once(',') {
+    //         Some((name, age)) => (name.trim(), age.trim()),
+    //         _ => return Person::default(),
+    //     };
+    //
+    //     if let Ok(age) = age.parse::<usize>() {
+    //         if name.len() > 0 {
+    //             return Person {
+    //                 name: name.to_string(),
+    //                 age,
+    //             };
+    //         }
+    //     }
+    //     Person::default()
+    // }
 }
 
 fn main() {
