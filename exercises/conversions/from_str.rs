@@ -45,7 +45,37 @@ enum ParsePersonError {
 
 impl FromStr for Person {
     type Err = ParsePersonError;
+    /// String to Person-Struct
+    /// "  name   ,    age<usize>   "
+    /// Requirements: two comma separated chunks
+    /// the first of which is a non-empty string
+    /// and them second of which can be parsed to <usize>
+    /// with only `.trim()` cleaning anything up
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        if s.is_empty() {
+            return Err(ParsePersonError::Empty);
+        }
+        match s {
+            s if s.is_empty() => return Err(ParsePersonError::Empty),
+            s if s.chars().filter(|c| *c == ',').count() != 1 => {
+                return Err(ParsePersonError::BadLen)
+            }
+            _ => (),
+        }
+        s.split_once(',')
+            .filter(|(name, age)| !name.is_empty())
+            .map(|(name, age)| {
+                age.trim()
+                    .parse::<usize>()
+                    .map_err(|e| ParsePersonError::ParseInt(e))
+                    .map(|age| Person {
+                        name: name.trim().to_string(),
+                        age,
+                    })
+            })
+            .ok_or(ParsePersonError::NoName)?
+        // let bap = boop.ok_or(|e| e).map_err(|e| ParsePersonError::Empty)?;
+        // .ok_or(ParsePersonError::Empty)
     }
 }
 
