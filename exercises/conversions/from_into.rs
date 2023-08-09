@@ -38,52 +38,24 @@ impl Default for Person {
 // I AM NOT DONE
 
 impl From<&str> for Person {
-    // This is TERRIBLE, but an initial implementation
-    // Repeated code (like returning default) all over
-    // and possibly repeated checks with is_empty
+    // 'single' iter solution
+    // uses `split_once()` to break number parsing if additional text at tail
+    // `.filter()` takes in the `Option`, returning `None` if given that
+    //             (we could also test age for presence here, but it is implicitely tested
+    //              when we try to parse it)
     fn from(s: &str) -> Person {
-        // test for other than two elements
-
-        let split = s.clone().split(',').collect::<Vec<_>>();
-        if split.len() != 2 {
-            return Person::default();
-        };
-
-        let mut split = s.split(',');
-
-        // test for leading name
-        let name = if let Some(chunk) = split.next() {
-            if chunk.is_empty() {
-                return Person::default();
-            }
-            chunk
-        } else {
-            return Person::default();
-        };
-
-        // test for trailing parseable age
-        let age = if let Some(chunk) = split.next() {
-            if chunk.is_empty() {
-                return Person::default();
-            }
-            match chunk.parse::<usize>() {
-                Ok(num) => num,
-                Err(_) => return Person::default(),
-            }
-        } else {
-            return Person::default();
-        };
-        let split = s.split(',').collect::<Vec<&str>>();
-        match s.split(',') {
-            x if x.clone().count() != 2 => Person::default(),
-            _ => Person::default(),
-        };
-
-        let out = Person {
-            name: name.to_string(),
-            age: age,
-        };
-        out
+        s.split_once(',')
+            .filter(|(name, age)| !name.is_empty())
+            .map(|(name, age)| {
+                age.parse()
+                    .map(|age| Person {
+                        name: name.into(),
+                        age,
+                    })
+                    .ok()
+            })
+            .flatten()
+            .unwrap_or_default()
     }
 }
 
